@@ -1,0 +1,43 @@
+<div class="example-container">
+  <h2>To do</h2>
+
+  <mat-form-field class="example-full-width">
+    <mat-label>value</mat-label>
+    <input matInput #inp (input)="input($event)">
+  </mat-form-field>
+
+  {{inp.value}}
+
+  <div cdkDropList
+    #todoList="cdkDropList"
+    [cdkDropListData]="todo | listFilter: selectedFilterText:dummy"
+    [cdkDropListConnectedTo]="[doneList]"
+    [id]="'todoList'"
+    class="example-list"
+    (cdkDropListDropped)="drop($event)">
+      @for (item of todo | listFilter: selectedFilterText:dummy; track item) {
+      <div class="example-box" cdkDrag>{{item}}</div>
+      }
+  </div>
+</div>
+
+<div class="example-container">
+  <h2>Done</h2>
+
+  <mat-form-field class="example-full-width">
+    <mat-label>Favorite food</mat-label>
+    <input matInput placeholder="Ex. Pizza" value="Sushi">
+  </mat-form-field>
+
+  <div
+    cdkDropList #doneList="cdkDropList"
+    [cdkDropListData]="done  | listFilter: availableFilterText:dummy"
+    [cdkDropListConnectedTo]="[todoList]"
+    [id]="'doneList'"
+    class="example-list"
+    (cdkDropListDropped)="drop($event)">
+      @for (item of done  | listFilter: availableFilterText:dummy; track item) {
+      <div class="example-box" cdkDrag>{{item}}</div>
+      }
+  </div>
+</div>
