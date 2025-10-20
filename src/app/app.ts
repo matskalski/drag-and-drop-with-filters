@@ -1,7 +1,10 @@
+import { ColumnsService } from './column/columns.service';
 import { CdkDrag, CdkDragDrop, CdkDropList, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
-import { Component, signal } from '@angular/core';
+import { Component, DestroyRef, inject, signal } from '@angular/core';
 import { MatInputModule } from '@angular/material/input';
 import { ListFilterPipe } from './list-filter.pipe';
+import { ColumnModel } from './column/column.model';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-root',
@@ -18,10 +21,28 @@ export class App {
   todo = ['Get to work', 'Pick up groceries', 'Go home', 'Fall asleep'];
   done = ['Get up', 'Brush teeth', 'Take a shower', 'Check e-mail', 'Walk dog'];
 
+  nonDisplayedColumns: ColumnModel[] = [];
+  displayedColumns: ColumnModel[] = [];
+
   selectedFilterText: string = '';
   availableFilterText: string = '';
 
-  dummy = 0;
+  triggerPipe = 0;
+
+  private columnsService = inject(ColumnsService);
+  private destroyRef = inject(DestroyRef);
+
+  constructor() {
+    this.columnsService.getColumns()
+      .pipe(
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe(cols => {
+        this.nonDisplayedColumns = cols.filter(col => !col.isDisplayed);
+        this.displayedColumns = cols.filter(col => col.isDisplayed);
+      });
+  };
+
 
   drop(event: CdkDragDrop<string[]>) {
     if (event.previousContainer === event.container) {
@@ -29,15 +50,27 @@ export class App {
       console.log('zmiana 1')
       moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
     } else {
-       console.log('zmiana2 ', event, event.previousContainer.id, event.container.id,  event.previousContainer.data,  event.container.data, event.previousIndex, event.currentIndex)
+      //przenoszenie między listami
+      console.log('zmiana2 ', event, event.previousContainer.id, event.container.id, event.previousContainer.data, event.container.data, event.previousIndex, event.currentIndex)
 
-       let itemId = event.previousContainer.data[event.previousIndex]
-       console.log(itemId)
+      let itemId = event.previousContainer.data[event.previousIndex]
+      console.log(itemId)
 
+      let from: string[];
+      let to: string[];
 
+      if (event.previousContainer.id === 'todoList') {
+        from = this.todo;
+        to = this.done;
+      }
+      else {
+        from = this.done;
+        to = this.todo;
+      }
 
-
-
+      let itemIndex = from.findIndex((x) => x == itemId);
+      from.splice(itemIndex, 1);
+      to.splice(event.currentIndex, 0, itemId)
 
       // transferArrayItem(
       //   event.previousContainer.data,
@@ -45,37 +78,16 @@ export class App {
       //   event.previousIndex,
       //   event.currentIndex,
       // );
-
-      let item = 1
-
     }
 
-    this.dummy++;
-
-    //console.log(this.todo, this.done)
+    this.triggerPipe++;
   }
 
-  //  drop(event: CdkDragDrop<string[]>) {
-  //   if (event.previousContainer !== event.container) {
-  //     let itemId = event.previousContainer.data[event.previousIndex].id;
-  //     if (event.previousContainer.id == 'selectedList') {
-  //       this.moveItem(this.todo, this.done, itemId);
-  //     } else {
-  //       this.moveItem(this.todo, this.done, itemId);
-  //     }
-  //     this.dummy++;
-  //   }
-  // }
-
-  // moveItem(fromList: string[], toList:string[], itemId: any) {
-  //   let item = fromList.find((x) => x == itemId);
-  //   let itemIndex = fromList.findIndex((x) => x == item);
-  //   fromList.splice(itemIndex, 1);
-  //   toList.push(item);
-  // }
-
-  input(e: Event){
-     //const value = (e.target as HTMLInputElement).value
+  filterTodo(e: Event) {
     this.selectedFilterText = (e.target as HTMLInputElement).value
+  }
+
+  filterDone(e: Event) {
+    this.availableFilterText = (e.target as HTMLInputElement).value
   }
 }

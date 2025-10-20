@@ -4,7 +4,7 @@ import { Pipe, PipeTransform } from '@angular/core';
   name: 'listFilter',
 })
 export class ListFilterPipe implements PipeTransform {
-  transform(list: any[], filterText: string, dummy: number): any {
+  transform(list: string[], filterText: string, triggerPipe: number): any {
     return !filterText
       ? list
       : list.filter(

@@ -3,21 +3,14 @@
 
   <mat-form-field class="example-full-width">
     <mat-label>value</mat-label>
-    <input matInput #inp (input)="input($event)">
+    <input matInput (input)="filterTodo($event)">
   </mat-form-field>
 
-  {{inp.value}}
-
-  <div cdkDropList
-    #todoList="cdkDropList"
-    [cdkDropListData]="todo | listFilter: selectedFilterText:dummy"
-    [cdkDropListConnectedTo]="[doneList]"
-    [id]="'todoList'"
-    class="example-list"
-    (cdkDropListDropped)="drop($event)">
-      @for (item of todo | listFilter: selectedFilterText:dummy; track item) {
-      <div class="example-box" cdkDrag>{{item}}</div>
-      }
+  <div cdkDropList #todoList="cdkDropList" [cdkDropListData]="todo | listFilter: selectedFilterText:triggerPipe"
+    [cdkDropListConnectedTo]="[doneList]" [id]="'todoList'" class="example-list" (cdkDropListDropped)="drop($event)">
+    @for (item of todo | listFilter: selectedFilterText:triggerPipe; track item) {
+    <div class="example-box" cdkDrag>{{item}}</div>
+    }
   </div>
 </div>
 
@@ -26,18 +19,13 @@
 
   <mat-form-field class="example-full-width">
     <mat-label>Favorite food</mat-label>
-    <input matInput placeholder="Ex. Pizza" value="Sushi">
+    <input matInput (input)="filterDone($event)">
   </mat-form-field>
 
-  <div
-    cdkDropList #doneList="cdkDropList"
-    [cdkDropListData]="done  | listFilter: availableFilterText:dummy"
-    [cdkDropListConnectedTo]="[todoList]"
-    [id]="'doneList'"
-    class="example-list"
-    (cdkDropListDropped)="drop($event)">
-      @for (item of done  | listFilter: availableFilterText:dummy; track item) {
-      <div class="example-box" cdkDrag>{{item}}</div>
-      }
+  <div cdkDropList #doneList="cdkDropList" [cdkDropListData]="done | listFilter: availableFilterText:triggerPipe"
+    [cdkDropListConnectedTo]="[todoList]" [id]="'doneList'" class="example-list" (cdkDropListDropped)="drop($event)">
+    @for (item of done | listFilter: availableFilterText:triggerPipe; track item) {
+    <div class="example-box" cdkDrag>{{item}}</div>
+    }
   </div>
 </div>
