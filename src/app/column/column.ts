@@ -10,4 +10,5 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 })
 export class Column {
   column = input.required<ColumnModel>()
+  showEditCheckbox = input<boolean>(false)
 }

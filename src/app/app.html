@@ -4,7 +4,6 @@
     <input matInput (input)="filterNonDisplayedColumns($event)">
   </mat-form-field>
 
-
   <div cdkDropList #nonDisplayedColumnsList="cdkDropList"
     [cdkDropListData]="nonDisplayedColumns | listFilter: nonDisplayeFilterText:triggerPipe"
     [cdkDropListConnectedTo]="[displayedColumnsList]" [id]="'nonDisplayedColumnsList'" class="example-list"
@@ -29,7 +28,7 @@
     (cdkDropListDropped)="drop($event)">
       @for (item of displayedColumns | listFilter: displayedFilterText:triggerPipe; track item.id) {
       <div class="example-box" cdkDrag>
-        <app-column [column]='item' />
+        <app-column [column]='item' [showEditCheckbox]="true"/>
       </div>
     }
   </div>

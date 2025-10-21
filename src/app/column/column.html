@@ -1,7 +1,9 @@
 <div class="flex flex-row justify-between items-center py-2">
   <span class="px-5 text-xl font-bold">{{column().name}}</span>
+  @if(showEditCheckbox()){
   <span class="flex flex-col px-5 items-center text-xs">
-      <span>mozliwość edycji</span>
-      <mat-checkbox [checked]="column().canEdit" class="example-margin"></mat-checkbox>
+    <span>mozliwość edycji</span>
+    <mat-checkbox [checked]="column().canEdit" class="example-margin"></mat-checkbox>
   </span>
+  }
 </div>
