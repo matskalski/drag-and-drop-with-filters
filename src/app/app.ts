@@ -1,14 +1,16 @@
 import { ColumnsService } from './column/columns.service';
-import { CdkDrag, CdkDragDrop, CdkDropList, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
+import { CdkDrag, CdkDragDrop, CdkDragPlaceholder, CdkDropList, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { Component, DestroyRef, inject, signal } from '@angular/core';
 import { MatInputModule } from '@angular/material/input';
 import { ListFilterPipe } from './list-filter.pipe';
 import { ColumnModel } from './column/column.model';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Column } from './column/column';
 
 @Component({
   selector: 'app-root',
   imports: [
+    Column,
     CdkDropList,
     CdkDrag,
     MatInputModule,
@@ -18,15 +20,15 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
   styleUrl: './app.css'
 })
 export class App {
-  todo = ['Get to work', 'Pick up groceries', 'Go home', 'Fall asleep'];
-  done = ['Get up', 'Brush teeth', 'Take a shower', 'Check e-mail', 'Walk dog'];
-
   nonDisplayedColumns: ColumnModel[] = [];
   displayedColumns: ColumnModel[] = [];
 
-  selectedFilterText: string = '';
-  availableFilterText: string = '';
+  nonDisplayeFilterText: string = '';
+  displayedFilterText: string = '';
 
+  //sztuczny twór konieczny do wymuszenia przeliczenia pipa za każdym razem
+  //bez tego wpisanie drugi raz tej samej wartości, w tym pustej,
+  //nie spowodowałoby trigerwania pipe'a
   triggerPipe = 0;
 
   private columnsService = inject(ColumnsService);
@@ -44,50 +46,40 @@ export class App {
   };
 
 
-  drop(event: CdkDragDrop<string[]>) {
+  drop(event: CdkDragDrop<ColumnModel[]>) {
     if (event.previousContainer === event.container) {
       //zmiana kolejności w obrębie jednej listy
-      console.log('zmiana 1')
       moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
     } else {
       //przenoszenie między listami
-      console.log('zmiana2 ', event, event.previousContainer.id, event.container.id, event.previousContainer.data, event.container.data, event.previousIndex, event.currentIndex)
-
       let itemId = event.previousContainer.data[event.previousIndex]
       console.log(itemId)
 
-      let from: string[];
-      let to: string[];
+      let from: ColumnModel[];
+      let to: ColumnModel[];
 
-      if (event.previousContainer.id === 'todoList') {
-        from = this.todo;
-        to = this.done;
+      if (event.previousContainer.id === 'nonDisplayedColumnsList') {
+        from = this.nonDisplayedColumns;
+        to = this.displayedColumns;
       }
       else {
-        from = this.done;
-        to = this.todo;
+        from = this.displayedColumns;
+        to = this.nonDisplayedColumns;
       }
 
       let itemIndex = from.findIndex((x) => x == itemId);
       from.splice(itemIndex, 1);
-      to.splice(event.currentIndex, 0, itemId)
-
-      // transferArrayItem(
-      //   event.previousContainer.data,
-      //   event.container.data,
-      //   event.previousIndex,
-      //   event.currentIndex,
-      // );
+      to.splice(event.currentIndex, 0, itemId);
     }
 
     this.triggerPipe++;
   }
 
-  filterTodo(e: Event) {
-    this.selectedFilterText = (e.target as HTMLInputElement).value
+  filterNonDisplayedColumns(e: Event) {
+    this.nonDisplayeFilterText = (e.target as HTMLInputElement).value
   }
 
-  filterDone(e: Event) {
-    this.availableFilterText = (e.target as HTMLInputElement).value
+  filterDisplayedColumns(e: Event) {
+    this.displayedFilterText = (e.target as HTMLInputElement).value
   }
 }
